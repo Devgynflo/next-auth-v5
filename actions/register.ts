@@ -9,7 +9,6 @@ import { getUserByEmail } from "@/data/user";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
-  console.log("🚀 ~ register ~ validatedFields:", validatedFields);
 
   if (!validatedFields.success) {
     return {
