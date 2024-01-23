@@ -15,3 +15,16 @@
   - Initialisation de la base de donnée
   - Importation des models pour la base de donnée (account, user )
     - Suppression des Models non utilisés (Session et verificationToken)
+  - Connection à la base de donnée
+  - Création des formulaires de login & register
+  - Hash du password avec bcrypt
+  - Initialisation de next-authV5
+
+    - Création du fichier auth.ts à la racine
+      - Du fait qu'on utilise un ORM, les sessions en base de donnée ne fonctionneent pas encore,
+        donc nous utilisons les jwt
+    - Création du fichier middleware à la racine , avec utilisation de la regex (exclu) de Clerck
+
+    ```
+    "/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"
+    ```

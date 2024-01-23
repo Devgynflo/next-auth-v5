@@ -1,6 +1,6 @@
 "use server";
 
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import * as z from "zod";
 
 import { RegisterSchema } from "@/schemas";
@@ -8,16 +8,17 @@ import prisma from "@/lib/db/prisma";
 import { getUserByEmail } from "@/data/user";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
-  const validatedFields = RegisterSchema.parse(values);
+  const validatedFields = RegisterSchema.safeParse(values);
+  console.log("🚀 ~ register ~ validatedFields:", validatedFields);
 
-  if (!validatedFields) {
+  if (!validatedFields.success) {
     return {
       success: false,
       message: "Invalid fields",
     };
   }
 
-  const { email, password, name } = validatedFields;
+  const { email, password, name } = validatedFields.data;
   const hashedpassword = await bcrypt.hash(password, 12);
 
   const existingUser = await getUserByEmail(email);
