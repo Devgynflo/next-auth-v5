@@ -1,13 +1,12 @@
-"use client";
+import { NewVerificationForm } from "@/components/auth/new-verification-form";
+import { Suspense } from "react";
 
-import { useSearchParams } from "next/navigation";
-
-
-
-const NewVerification = () => {
-    const searchParams = useSearchParams();
-    const token = searchParams.get("token");
-    return ( <>Bienvenue sur la page de vérification{token}</> );
+const NewVerificationPage = () => {
+    
+    return ( 
+        <Suspense>
+            <NewVerificationForm/>
+        </Suspense> );
 }
  
-export default NewVerification;
+export default NewVerificationPage;

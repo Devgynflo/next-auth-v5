@@ -7,6 +7,8 @@ import * as z from "zod";
 import { useState, useTransition } from "react";
 
 import { RegisterSchema } from "@/schemas";
+import { register } from "@/actions/register";
+
 // Components
 import {
   Form,
@@ -20,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
-import { register } from "@/actions/register";
 
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition();

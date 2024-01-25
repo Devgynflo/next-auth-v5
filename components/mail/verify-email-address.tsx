@@ -16,9 +16,7 @@ interface AWSVerifyEmailProps {
   confirmLink?: string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
+const baseUrl = 'https://logodownload.org/wp-content/uploads/2014/04/amazon-logo-0.png';
 
 export const VerifyEmailAddress = ({
   confirmLink
@@ -32,7 +30,7 @@ export const VerifyEmailAddress = ({
           <Section style={coverSection}>
             <Section style={imageSection}>
               <Img
-                src={`${baseUrl}/static/aws-logo.png`}
+                src={`${baseUrl}`}
                 width="75"
                 height="45"
                 alt="Notion's Logo"
