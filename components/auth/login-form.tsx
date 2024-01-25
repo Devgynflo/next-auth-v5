@@ -2,12 +2,16 @@
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useState, useTransition } from "react";
 
 import { LoginSchema } from "@/schemas";
 // Components
+import { login } from "@/actions/login";
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -17,12 +21,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { FormError } from "@/components/form-error";
-import { FormSuccess } from "@/components/form-success";
-import { login } from "@/actions/login";
+import { useSearchParams } from "next/navigation";
 
 export const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ?  "You already have an account with this email." : "";
+  
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -33,6 +37,7 @@ export const LoginForm = () => {
       password: "",
     },
   });
+  
 
   /* Soumission du formulaire */
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
@@ -41,13 +46,17 @@ export const LoginForm = () => {
 
     startTransition(() => {
       login(values).then((response) => {
-        if (!response.success) {
+        if(response) {
+          if (!response.success) {
           setError(response.message);
           setSuccess("");
         } else {
+          // TODO Add when we add 2FA 3:46
           setError("");
           setSuccess(response.message);
         }
+        }
+        
       });
     });
   };
@@ -102,7 +111,8 @@ export const LoginForm = () => {
           </div>
 
           {/* Gestion des erreurs */}
-          {error && <FormError message={error} />}
+          {error || urlError ? <FormError message={error || urlError} /> : null}
+          {/* Gestion du succès du submit */}
           {success && <FormSuccess message={success} />}
 
           <Button disabled={isPending} className="w-full">

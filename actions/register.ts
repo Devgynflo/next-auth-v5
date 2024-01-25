@@ -3,9 +3,11 @@
 import bcrypt from "bcryptjs";
 import * as z from "zod";
 
-import { RegisterSchema } from "@/schemas";
-import prisma from "@/lib/db/prisma";
 import { getUserByEmail } from "@/data/user";
+import prisma from "@/lib/db/prisma";
+import { sendVerificationEmail } from "@/lib/resend/mail";
+import { generateVerificationToken } from "@/lib/token";
+import { RegisterSchema } from "@/schemas";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
@@ -29,7 +31,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     };
   }
 
-  const newUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email,
       name,
@@ -37,10 +39,11 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     },
   });
 
-  //TODO: Send verification token email
-
+  const verificationToken = await generateVerificationToken(email);
+  // Send verification token email
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
   return {
     success: true,
-    message: "Email sent!",
+    message: "Confirmation email sent",
   };
 };

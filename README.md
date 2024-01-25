@@ -1,3 +1,7 @@
+A rectifier =>
+
+- 🗹 je n'ai pas les erreurs de retour avec les providers si l'email est déjà utilisé par l'un d'entre eux.
+
 20 janvier 2024
 
 - Initialisation du projet
