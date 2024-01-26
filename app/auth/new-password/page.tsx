@@ -1,11 +1,11 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
+import { NewPasswordForm } from "@/components/auth/new-password-form";
+import { Suspense } from "react";
 
 const NewPasswordPage = () => {
-    const token = useSearchParams().get('token');
-
-    return ( <>{token}</> );
+    return ( 
+    <Suspense>
+        <NewPasswordForm/>
+    </Suspense> );
 }
  
 export default NewPasswordPage;
