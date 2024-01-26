@@ -12,15 +12,15 @@ import {
   Text,
 } from "@react-email/components";
 
-interface AWSVerifyEmailProps {
-  confirmLink?: string;
+interface VerifyEmailProps {
+  confirmLink: string;
 }
 
 const baseUrl = 'https://logodownload.org/wp-content/uploads/2014/04/amazon-logo-0.png';
 
 export const VerifyEmailAddress = ({
   confirmLink
-}: AWSVerifyEmailProps) => {
+}: VerifyEmailProps) => {
   return (
     <Html>
       <Head />
