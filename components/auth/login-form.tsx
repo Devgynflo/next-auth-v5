@@ -29,7 +29,9 @@ import { Input } from "@/components/ui/input";
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ?  "You already have an account with this email." : "";
-  
+  const callbackUrl = searchParams.get("callbackUrl");
+
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -41,15 +43,37 @@ export const LoginForm = () => {
     },
   });
   
-
+  const resetForm = () => {
+      if(!showTwoFactor) {
+        form.reset();
+      }
+      form.resetField("code");
+    }
   /* Soumission du formulaire */
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    setError("");
-    setSuccess("");
+    
+    startTransition(async () => {
+      login(values, callbackUrl).then((response) => {
 
-    startTransition(() => {
-      login(values).then((response) => {
-        if(response) {
+        
+        if(!response?.success) {
+          resetForm();
+          setError(response?.message || "");
+        }
+
+        if(response?.success) {
+          resetForm();
+          setSuccess(response?.message);
+        }
+
+         if(response?.twoFactor) {
+          
+          setShowTwoFactor(true);
+        }
+
+        
+        /*
+         if(response) {
           if (!response.success) {
           setError(response.message);
           setSuccess("");
@@ -57,8 +81,9 @@ export const LoginForm = () => {
           // TODO Add when we add 2FA 3:46
           setError("");
           setSuccess(response.message);
+        } 
         }
-        }
+        */
         
       });
     });
@@ -69,12 +94,31 @@ export const LoginForm = () => {
       headerLabel="Welcome back"
       backButtonLabel="Don't have an account"
       backButtonHref="/auth/register"
-      showSocial
+      showSocial={!showTwoFactor}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            <FormField
+              {showTwoFactor && (
+              <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>code</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="123456"
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />)}
+              {!showTwoFactor && (<>
+              <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -112,7 +156,11 @@ export const LoginForm = () => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /></>)}
+
+            
+            
+
           </div>
 
           {/* Gestion des erreurs */}
@@ -120,9 +168,11 @@ export const LoginForm = () => {
           {/* Gestion du succès du submit */}
           {success && <FormSuccess message={success} />}
 
-          <Button disabled={isPending} className="w-full">
-            Login
+          <Button disabled={isPending} className="w-full" type="submit">
+            {showTwoFactor ? "Verify" : "Login"}
           </Button>
+
+          
         </form>
       </Form>
     </CardWrapper>

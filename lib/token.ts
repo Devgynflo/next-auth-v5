@@ -1,8 +1,36 @@
+import crypto from "crypto";
+import { v4 as uuidV4 } from "uuid";
+
 import { getPasswordResetTokenByEmail } from "@/data/password-reset-token";
+import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { getVerificationTokenByEmail } from "@/data/verification-token";
 
 import prisma from "@/lib/db/prisma";
-import { v4 as uuidV4 } from "uuid";
+
+export const generateTwoFactorToken = async (email: string) => {
+  const token = crypto.randomInt(100_000, 1_000_000).toString();
+  // TODO: Later change to 15 minutes (900)
+  const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
+
+  const existingToken = await getTwoFactorTokenByEmail(email);
+  if (existingToken) {
+    await prisma?.twoFactorToken.delete({
+      where: {
+        id: existingToken.id,
+      },
+    });
+  }
+
+  const twoFactorToken = await prisma.twoFactorToken.create({
+    data: {
+      email,
+      token,
+      expires,
+    },
+  });
+
+  return twoFactorToken;
+};
 
 export const generatePasswordResetToken = async (email: string) => {
   const token = uuidV4();
