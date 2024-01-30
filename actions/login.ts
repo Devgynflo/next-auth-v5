@@ -20,7 +20,7 @@ import prisma from "@/lib/db/prisma";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
-  callbackUrl?: string | null
+  callbackUrl?: string
 ) => {
   // Check some entries
   const validatedFields = LoginSchema.safeParse(values);

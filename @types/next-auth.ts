@@ -3,7 +3,7 @@ import { DefaultSession } from "next-auth";
 
 export type ExtendedUser = DefaultSession["user"] & {
   role: UserRole;
-  isTwoFactorEnabled: boolean;
+  //isTwoFactorEnabled: boolean;
 };
 
 declare module "next-auth" {
@@ -12,6 +12,7 @@ declare module "next-auth" {
       id: string;
       role: "ADMIN" | "USER";
       isTwoFactorEnabled: boolean;
+      isOAuth: boolean;
     } & DefaultSession["user"];
   }
 }

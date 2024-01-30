@@ -35,11 +35,12 @@ export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
-      password: "",
+      password: "",  
     },
   });
   
@@ -55,7 +56,6 @@ export const LoginForm = () => {
     startTransition(async () => {
       login(values, callbackUrl).then((response) => {
 
-        
         if(!response?.success) {
           resetForm();
           setError(response?.message || "");
@@ -69,22 +69,7 @@ export const LoginForm = () => {
          if(response?.twoFactor) {
           
           setShowTwoFactor(true);
-        }
-
-        
-        /*
-         if(response) {
-          if (!response.success) {
-          setError(response.message);
-          setSuccess("");
-        } else {
-          // TODO Add when we add 2FA 3:46
-          setError("");
-          setSuccess(response.message);
         } 
-        }
-        */
-        
       });
     });
   };
@@ -105,12 +90,11 @@ export const LoginForm = () => {
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>code</FormLabel>
+                  <FormLabel>Code</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="123456"
-                      disabled={isPending}
+                      placeholder="123456"          
                     />
                   </FormControl>
                   <FormMessage />
