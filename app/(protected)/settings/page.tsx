@@ -36,8 +36,8 @@ const SettingsPage =  () => {
       email: currentUser?.email || undefined,
       isTwoFactorEnabled: currentUser?.isTwoFactorEnabled || undefined,
       role: currentUser?.role || undefined,
-       password: undefined,
-      newPassword: undefined, 
+      password: "",
+      newPassword: "", 
     }
   });
 
@@ -102,6 +102,7 @@ const SettingsPage =  () => {
                             placeholder="******"
                             type="password"
                             disabled={isPending}
+                            value={field.value || ""}
                             
                           />
                         </FormControl>
@@ -122,6 +123,7 @@ const SettingsPage =  () => {
                             placeholder="******"
                             type="password"
                             disabled={isPending}
+                            value={field.value || ""}
                           />
                         </FormControl>
                         <FormMessage />

@@ -20,26 +20,18 @@ import prisma from "@/lib/db/prisma";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
-  callbackUrl?: string
+  callbackUrl?: string | null
 ) => {
   // Check some entries
   const validatedFields = LoginSchema.safeParse(values);
   if (!validatedFields.success) {
-    return {
-      success: false,
-      message: "Invalid fields",
-      twoFactor: null,
-    };
+    return { error: "Invalid fields!" };
   }
   // Check if user exists with email
   const { email, password, code } = validatedFields.data;
   const existingUser = await getUserByEmail(email);
   if (!existingUser || !existingUser.email || !existingUser.password) {
-    return {
-      success: false,
-      message: "Email does not exist",
-      twoFactor: null,
-    };
+    return { error: "Email does not exist!" };
   }
 
   const comparePassword = await bcryptjs.compare(
@@ -48,11 +40,7 @@ export const login = async (
   );
 
   if (!comparePassword) {
-    return {
-      success: false,
-      message: "Invalid password",
-      twoFactor: null,
-    };
+    return { error: "Invalid Password" };
   }
 
   // Generate new token if user has not verified email
@@ -66,42 +54,23 @@ export const login = async (
       verificationToken.token
     );
 
-    return {
-      success: true,
-      message: "Confirmation email sent",
-      twoFactor: null,
-    };
+    return { success: "Confirmation email sent!" };
   }
-
   // Generate new token if user has not verified 2FA
   if (existingUser.isTwoFactorEnabled && existingUser.email) {
-    console.log(code);
     if (code) {
       const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
-      console.log("🚀 ~ twoFactorToken:", twoFactorToken);
       if (!twoFactorToken) {
-        return {
-          success: false,
-          message: "Invalid code",
-          twoFactor: null,
-        };
+        return { error: "Invalid code!" };
       }
 
       if (twoFactorToken.token !== code) {
-        return {
-          success: false,
-          message: "Invalid code",
-          twoFactor: null,
-        };
+        return { error: "Invalid code!" };
       }
 
       const hasExpired = new Date(twoFactorToken.expires) < new Date();
       if (hasExpired) {
-        return {
-          success: false,
-          message: "Code has expired",
-          twoFactor: null,
-        };
+        return { error: "Code expired!" };
       }
 
       await prisma.twoFactorToken.delete({
@@ -132,11 +101,7 @@ export const login = async (
       // Send two-factor email  for verification
       await sendTwoFactorTokenEmail(twoFactoToken.email, twoFactoToken.token);
 
-      return {
-        success: null,
-        message: null,
-        twoFactor: true,
-      };
+      return { twoFactor: true };
     }
   }
 

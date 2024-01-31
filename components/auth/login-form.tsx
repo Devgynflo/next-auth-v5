@@ -52,22 +52,19 @@ export const LoginForm = () => {
     }
   /* Soumission du formulaire */
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    
-    startTransition(async () => {
-      login(values, callbackUrl).then((response) => {
-
-        if(!response?.success) {
+    startTransition(() => {
+      login(values, callbackUrl).then((data) => {
+        
+        if(data?.error) {
           resetForm();
-          setError(response?.message || "");
+          setError(data?.error);
         }
 
-        if(response?.success) {
+        if(data?.success) {
           resetForm();
-          setSuccess(response?.message);
-        }
-
-         if(response?.twoFactor) {
-          
+          setSuccess(data?.success as string);
+        } 
+        if(data?.twoFactor) {
           setShowTwoFactor(true);
         } 
       });
@@ -85,6 +82,7 @@ export const LoginForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
               {showTwoFactor && (
+              <>
               <FormField
               control={form.control}
               name="code"
@@ -94,13 +92,16 @@ export const LoginForm = () => {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="123456"          
+                      placeholder="123456"
+                      value={field.value || ""}          
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            />)}
+            />
+              </>
+            )}
               {!showTwoFactor && (<>
               <FormField
               control={form.control}
@@ -152,7 +153,7 @@ export const LoginForm = () => {
           {/* Gestion du succès du submit */}
           {success && <FormSuccess message={success} />}
 
-          <Button disabled={isPending} className="w-full" type="submit">
+          <Button className="w-full">
             {showTwoFactor ? "Verify" : "Login"}
           </Button>
 
